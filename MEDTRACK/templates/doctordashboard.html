@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>MedTrack • Doctor Dashboard</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"/>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{display:flex;font-family:'Poppins',sans-serif;min-height:100vh;background:#f0f4f8;}
+
+nav{width:240px;background:#2c7a7b;color:#fff;}
+nav h2{text-align:center;padding:1.75rem 1rem;border-bottom:1px solid #276a6b;}
+nav ul{list-style:none;}
+nav li{cursor:pointer;padding:1rem 1.5rem;display:flex;align-items:center;gap:1rem;transition:background 0.2s;}
+nav li:hover,nav li.active{background:#1f5b5c;}
+nav li i{width:20px;}
+
+main{flex:1;padding:1.5rem;overflow-y:auto;}
+
+.header{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:1.5rem;
+}
+
+.user{font-size:1rem;color:#2c7a7b;}
+
+.stats-grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+gap:1rem;
+margin-bottom:1.5rem;
+}
+
+.stat-box{
+background:#fff;
+border-radius:8px;
+padding:1rem;
+display:flex;
+align-items:center;
+gap:.75rem;
+box-shadow:0 4px 16px rgba(0,0,0,0.05);
+cursor:pointer;
+}
+
+.card-grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
+gap:1rem;
+}
+
+.card{
+background:#fff;
+border-radius:8px;
+padding:1.25rem;
+box-shadow:0 4px 16px rgba(0,0,0,0.05);
+display:flex;
+flex-direction:column;
+gap:.75rem;
+}
+
+.card h3{
+display:flex;
+align-items:center;
+gap:.5rem;
+color:#2c7a7b;
+}
+
+table{width:100%;border-collapse:collapse;}
+th,td{padding:.5rem .75rem;text-align:left;border-bottom:1px solid #e2e8f0;}
+th{background:#e9edf2;}
+
+.badge{
+padding:.2rem .6rem;
+border-radius:4px;
+font-size:.85rem;
+font-weight:600;
+display:inline-block;
+}
+
+.missed{background:#fed7d7;color:#c53030;}
+
+.btn{
+padding:.5rem .9rem;
+background:#2c7a7b;
+color:#fff;
+border:none;
+border-radius:4px;
+font-weight:500;
+cursor:pointer;
+}
+
+.btn:hover{background:#235a5b;}
+</style>
+</head>
+
+<body>
+
+<nav>
+<h2><i class="fa-solid fa-hospital"></i> MedTrack</h2>
+
+<ul id="menu">
+<li class="active" data-tab="dashboard"><i class="fa-solid fa-gauge"></i> Dashboard</li>
+<li data-tab="appointments"><i class="fa-solid fa-calendar"></i> Appointments</li>
+<li data-tab="patients"><i class="fa-solid fa-user-injured"></i> Patients</li>
+<li data-tab="settings"><i class="fa-solid fa-gear"></i> Settings</li>
+</ul>
+</nav>
+
+<main>
+
+<div class="header">
+
+<h2 id="section-title">Dashboard</h2>
+
+<div style="display:flex;align-items:center;gap:15px;">
+
+<div class="user">
+<i class="fa-solid fa-user-md"></i> Dr. {{ name }}
+</div>
+
+<a href="/logout" class="btn" style="background:#c53030;">
+<i class="fa-solid fa-right-from-bracket"></i> Logout
+</a>
+
+</div>
+
+</div>
+
+<section id="dashboard" class="tab-content">
+
+<div class="stats-grid">
+
+<div class="stat-box" onclick="document.querySelector('[data-tab=appointments]').click()">
+<i class="fa-solid fa-calendar-check"></i>
+<div>
+<span>{{ todays_appointments }}</span>
+<div>Today's Appointments</div>
+</div>
+</div>
+
+<div class="stat-box" onclick="document.querySelector('[data-tab=appointments]').click()">
+<i class="fa-solid fa-pills"></i>
+<div>
+<span>{{ total_meds_due }}</span>
+<div>Medications Due</div>
+</div>
+</div>
+
+<div class="stat-box">
+<i class="fa-solid fa-bell"></i>
+<div>
+<span>{{ alerts }}</span>
+<div>Alerts</div>
+</div>
+</div>
+
+<div class="stat-box" onclick="document.querySelector('[data-tab=patients]').click()">
+<i class="fa-solid fa-users"></i>
+<div>
+<span>{{ total_patients }}</span>
+<div>Total Patients</div>
+</div>
+</div>
+
+</div>
+
+<div class="card-grid">
+
+<div class="card">
+
+<h3><i class="fa-solid fa-calendar-days"></i> Upcoming Appointments</h3>
+
+<table>
+<thead>
+<tr>
+<th>Patient</th>
+<th>Age</th>
+<th>Department</th>
+<th>Problem</th>
+</tr>
+</thead>
+
+<tbody>
+
+{% for appt in appointments %}
+
+<tr>
+<td>{{ appt.get('name','N/A') }}</td>
+<td>{{ appt.get('age','N/A') }}</td>
+<td>{{ appt.get('department','N/A') }}</td>
+<td>{{ appt.get('problem','N/A') }}</td>
+</tr>
+
+{% else %}
+
+<tr>
+<td colspan="4">No appointments yet.</td>
+</tr>
+
+{% endfor %}
+
+</tbody>
+</table>
+
+</div>
+
+<div class="card">
+<h3><i class="fa-solid fa-chart-bar"></i> Weekly Adherence</h3>
+<canvas id="chart"></canvas>
+</div>
+
+</div>
+
+</section>
+
+
+<section id="appointments" class="tab-content" style="display:none;">
+
+<div class="card">
+
+<h3><i class="fa-solid fa-calendar-check"></i> All Appointments</h3>
+
+<table>
+
+<thead>
+<tr>
+<th>S.No.</th>
+<th>Patient</th>
+<th>Doctor</th>
+<th>Date</th>
+<th>Time</th>
+<th>Status</th>
+<th>Action</th>
+</tr>
+</thead>
+
+<tbody>
+
+{% for appt in appointments %}
+
+<tr>
+
+<td>{{ loop.index }}</td>
+<td>{{ appt.get('name','N/A') }}</td>
+<td>{{ appt.get('doctor','N/A') }}</td>
+<td>{{ appt.get('date','N/A') }}</td>
+<td>{{ appt.get('time','N/A') }}</td>
+<td>{{ appt.get('status','Pending') }}</td>
+
+<td>
+
+<form method="POST">
+
+<input type="hidden" name="appointment_id" value="{{ appt.get('id','') }}">
+
+<button type="submit" name="decision" value="Accepted" class="btn">Accept</button>
+
+<button type="submit" name="decision" value="Rejected" class="btn" style="background:#c53030;">
+Reject
+</button>
+
+</form>
+
+</td>
+
+</tr>
+
+{% else %}
+
+<tr>
+<td colspan="7">No appointments yet.</td>
+</tr>
+
+{% endfor %}
+
+</tbody>
+
+</table>
+
+</div>
+
+</section>
+
+
+<section id="patients" class="tab-content" style="display:none;">
+<div class="card">
+<h3><i class="fa-solid fa-users"></i> Your Patients</h3>
+
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Age</th>
+<th>Email</th>
+<th>Problem</th>
+</tr>
+</thead>
+
+<tbody>
+
+{% for appt in appointments %}
+
+<tr>
+<td>{{ appt.get('name','N/A') }}</td>
+<td>{{ appt.get('age','N/A') }}</td>
+<td>{{ appt.get('email','N/A') }}</td>
+<td>{{ appt.get('problem','N/A') }}</td>
+</tr>
+
+{% else %}
+
+<tr>
+<td colspan="4">No patients yet.</td>
+</tr>
+
+{% endfor %}
+
+</tbody>
+</table>
+
+</div>
+</section>
+
+
+<section id="settings" class="tab-content" style="display:none;">
+
+<div class="card">
+
+<h3><i class="fa-solid fa-gear"></i> Settings</h3>
+
+<form method="POST" action="/update_doctor_profile">
+
+<label>Name</label>
+<input type="text" name="name" value="{{ name }}" required>
+
+<label>Email</label>
+<input type="email" name="email" value="{{ email }}" required>
+
+<label>Phone</label>
+<input type="text" name="phone" value="{{ phone if phone else '' }}">
+
+<br><br>
+
+<button class="btn" type="submit">Update Profile</button>
+
+</form>
+
+</div>
+
+</section>
+
+
+</main>
+
+<script>
+
+document.querySelectorAll('#menu li').forEach(li=>{
+li.addEventListener('click',()=>{
+document.querySelector('#menu li.active').classList.remove('active');
+li.classList.add('active');
+
+document.querySelectorAll('.tab-content').forEach(el=>el.style.display='none');
+
+document.getElementById(li.dataset.tab).style.display='block';
+
+document.getElementById('section-title').innerText=li.innerText.trim();
+});
+});
+
+const ctx=document.getElementById('chart').getContext('2d');
+
+new Chart(ctx,{
+type:'bar',
+data:{
+labels:['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],
+datasets:[{
+label:'Adherence %',
+data:[90,85,92,88,95,80,93],
+backgroundColor:'#2f855a'
+}]
+},
+options:{
+scales:{y:{beginAtZero:true,max:100}},
+responsive:true,
+plugins:{legend:{display:false}}
+}
+});
+
+</script>
+
+</body>
+</html>
