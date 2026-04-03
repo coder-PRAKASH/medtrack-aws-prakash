@@ -1,11 +1,6 @@
-MedTrack 🏥
 
-MedTrack is a cloud-enabled healthcare management system built using Flask and AWS services.
-It allows patients to book appointments with doctors, manage medications, and receive automated notifications.
 
-The application integrates AWS DynamoDB for data storage and AWS SNS for email notifications.
-
-MedTrack 🏥
+# MedTrack 🏥 (AWS Cloud-Based Healthcare System)
 
 MedTrack is a cloud-enabled healthcare management system built using Flask and AWS services.
 It allows patients to book appointments with doctors, manage medications, and receive automated notifications.
@@ -40,8 +35,8 @@ medtrack/
 Follow these steps to run the project locally.
 
 1️⃣ Clone the Repository
-git clone https://github.com/YOUR_USERNAME/MedTrack.git
-cd MedTrack
+git clone https://github.com/coder-PRAKASH/medtrack-aws-prakash.git
+cd medtrack-aws-prakash
 
 2️⃣ Create Virtual Environment
 
@@ -138,5 +133,13 @@ Appointment is stored in DynamoDB
 SNS publishes a notification
 
 Email is sent to subscribed users
+## 👤 Author
+Prakash  
+GitHub: https://github.com/coder-PRAKASH
+## 🚀 My Contributions
+
+- Worked on project setup and execution  
+- Learned and implemented AWS services (DynamoDB, SNS)  
+- Uploaded and managed project on GitHub  
 
 
