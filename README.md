@@ -138,8 +138,10 @@ Prakash
 GitHub: https://github.com/coder-PRAKASH
 ## 🚀 My Contributions
 
-- Worked on project setup and execution  
-- Learned and implemented AWS services (DynamoDB, SNS)  
-- Uploaded and managed project on GitHub  
-
+ Configured AWS IAM, DynamoDB, and SNS services.
+- Integrated AWS DynamoDB for cloud-based data storage.
+- Implemented patient registration, login, and appointment management.
+- Configured AWS SNS notifications for appointment alerts.
+- Set up and tested the application on a local development environment connected to AWS.
+- Maintained project documentation and GitHub repository.
 
